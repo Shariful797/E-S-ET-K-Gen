@@ -21,7 +21,8 @@ on:
         - 10minutemail
         - guerrillamail
         - developermail
-        default: developermail
+        - mailticking
+        default: mailticking
       key_type:
         description: 'Choose the key type'
         required: true
