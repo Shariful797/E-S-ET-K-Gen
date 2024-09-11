@@ -337,8 +337,8 @@ def main():
                         '-------------------------------------------------',
                         ''
                     ])
-                    output_line = f'\n🔸 Product: ||{license_name}||\n🕐 Expire: ||{license_out_date}||\n🔐 License: `{license_key}`\n'
-                    bot.send_message(-1001219056300, output_line + "@LicenseForAll")
+                    output_line = f'\n🟢 Product: ||{license_name}||\n🕐 Exp: ||{license_out_date}||\n🔑 Key: `{license_key}`\n\n\n'
+                    bot.send_message(-1001370118432, output_line + "@FreeLicense4All")
             # ESET ProtectHub
             elif args['protecthub_account'] or args['endpoint_key']:
                 EPHR_obj = EPHR(email_obj, eset_password, driver)
@@ -371,8 +371,8 @@ def main():
                             '---------------------------------------------------------------------',
                             ''
                         ])
-                    output_line = f'\n🔸 Product: ||{license_name}||\n🕐 Expire: ||{license_out_date}||\n🔐 License: `{license_key}`\n'
-                    bot.send_message(-1001219056300, output_line + "@LicenseForAll")
+                    output_line = f'\n🟢 Product: ||{license_name}||\n🕐 Exp: ||{license_out_date}||\n🔑 License: `{license_key}`\n\n\n'
+                    bot.send_message(-1001370118432, output_line + "@FreeLicense4All")
             # end
             console_log(output_line)
             date = datetime.datetime.now()
