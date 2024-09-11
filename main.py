@@ -1,3 +1,5 @@
+import telebot
+
 from modules.WebDriverInstaller import *
 
 # Bypassing ESET antivirus detection
@@ -200,6 +202,7 @@ def parse_argv():
         args_parser.add_argument('--skip-update-check', action='store_true', help='Skips checking for program updates')
         args_parser.add_argument('--no-logo', action='store_true', help='Replaces ASCII-Art with plain text')
         args_parser.add_argument('--disable-progress-bar', action='store_true', help='Disables the webdriver download progress bar')
+        args_parser.add_argument('--token', help='Token value')
         try:
             global args
             args = vars(args_parser.parse_args())
@@ -253,6 +256,8 @@ def main():
         # initialization and configuration of everything necessary for work            
         driver = None
         webdriver_path = None
+        token_value = args['token']
+        bot = telebot.TeleBot(token_value, parse_mode='MARKDOWNv2')
         browser_name = GOOGLE_CHROME
         if args['firefox']:
             browser_name = MOZILLA_FIREFOX
@@ -332,7 +337,8 @@ def main():
                         '-------------------------------------------------',
                         ''
                     ])
-                    
+                    output_line = f'\n🔸 Product: ||{license_name}||\n🕐 Expire: ||{license_out_date}||\n🔐 License: `{license_key}`\n'
+                    bot.send_message(-1001219056300, output_line + "@LicenseForAll")
             # ESET ProtectHub
             elif args['protecthub_account'] or args['endpoint_key']:
                 EPHR_obj = EPHR(email_obj, eset_password, driver)
@@ -365,7 +371,8 @@ def main():
                             '---------------------------------------------------------------------',
                             ''
                         ])
-
+                    output_line = f'\n🔸 Product: ||{license_name}||\n🕐 Expire: ||{license_out_date}||\n🔐 License: `{license_key}`\n'
+                    bot.send_message(-1001219056300, output_line + "@LicenseForAll")
             # end
             console_log(output_line)
             date = datetime.datetime.now()
