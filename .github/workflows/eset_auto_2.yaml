@@ -42,7 +42,7 @@ jobs:
         run: |
           ACCOUNT=0
           KEY=2
-          MAIL=developermail
+          MAIL=mailticking
           KEY_TYPE=--small-business-key
 
           git clone https://github.com/ShafiqSadat/ESET-KeyGen.git
