@@ -1,15 +1,69 @@
-import telebot
+from modules.EmailAPIs import *
+
+# ---- Quick settings [for Developers to quickly change behavior without changing all files] ----
+VERSION = ['v1.5.1.2', 1512]
+LOGO = f"""
+███████╗███████╗███████╗████████╗   ██╗  ██╗███████╗██╗   ██╗ ██████╗ ███████╗███╗   ██╗
+██╔════╝██╔════╝██╔════╝╚══██╔══╝   ██║ ██╔╝██╔════╝╚██╗ ██╔╝██╔════╝ ██╔════╝████╗  ██║
+█████╗  ███████╗█████╗     ██║      █████╔╝ █████╗   ╚████╔╝ ██║  ███╗█████╗  ██╔██╗ ██║
+██╔══╝  ╚════██║██╔══╝     ██║      ██╔═██╗ ██╔══╝    ╚██╔╝  ██║   ██║██╔══╝  ██║╚██╗██║   
+███████╗███████║███████╗   ██║      ██║  ██╗███████╗   ██║   ╚██████╔╝███████╗██║ ╚████║   
+╚══════╝╚══════╝╚══════╝   ╚═╝      ╚═╝  ╚═╝╚══════╝   ╚═╝    ╚═════╝ ╚══════╝╚═╝  ╚═══╝                                                                      
+                                                Project Version: {VERSION[0]}
+                                                Project Devs: rzc0d3r, AdityaGarg8, k0re,
+                                                              Fasjeit, alejanpa17, Ischunddu,
+                                                              soladify, AngryBonk, Xoncia,
+                                                              Anteneh13
+"""
+
+DEFAULT_EMAIL_API = 'developermail'
+AVAILABLE_EMAIL_APIS = ('1secmail', 'guerrillamail', 'developermail', 'mailticking')
+WEB_WRAPPER_EMAIL_APIS = ('guerrillamail', 'mailticking')
+EMAIL_API_CLASSES = {
+    'guerrillamail': GuerRillaMailAPI,    
+    '1secmail': OneSecEmailAPI,
+    'developermail': DeveloperMailAPI,
+    'mailticking': MailTickingAPI
+}
+MAX_REPEATS_LIMIT = 10
+
+args = {
+    'chrome': True,
+    'firefox': False,
+    'edge': False,
+
+    'key': True,
+    'small_business_key': False,
+    'endpoint_key': False,
+    'vpn_codes': False,
+    'account': False,
+    'protecthub_account': False,
+    'only_webdriver_update': False,
+    'update': False,
+
+    'skip_webdriver_menu': False,
+    'no_headless': False,
+    'custom_browser_location': '',
+    'email_api': DEFAULT_EMAIL_API,
+    'custom_email_api': False,
+    'skip_update_check': False,
+    'no_logo': False,
+    'disable_progress_bar': False,
+    'disable_output_file': False,
+    'repeat': 1
+}
+# -----------------------------------------------------------------------------------------------
 
 from modules.WebDriverInstaller import *
 
 # Bypassing ESET antivirus detection
 from modules.EsetTools import EsetRegister as ER
 from modules.EsetTools import EsetKeygen as EK
+from modules.EsetTools import EsetVPN as EV
 from modules.EsetTools import EsetProtectHubRegister as EPHR
 from modules.EsetTools import EsetProtectHubKeygen as EPHK
 
 from modules.SharedTools import *
-from modules.EmailAPIs import *
 from modules.Updater import get_assets_from_version, parse_update_json, updater_main
 from modules.MBCI import *
 
@@ -22,19 +76,6 @@ import time
 import sys
 import re
 
-VERSION = ['v1.5.0.6', 1506]
-LOGO = f"""
-███████╗███████╗███████╗████████╗   ██╗  ██╗███████╗██╗   ██╗ ██████╗ ███████╗███╗   ██╗
-██╔════╝██╔════╝██╔════╝╚══██╔══╝   ██║ ██╔╝██╔════╝╚██╗ ██╔╝██╔════╝ ██╔════╝████╗  ██║
-█████╗  ███████╗█████╗     ██║      █████╔╝ █████╗   ╚████╔╝ ██║  ███╗█████╗  ██╔██╗ ██║
-██╔══╝  ╚════██║██╔══╝     ██║      ██╔═██╗ ██╔══╝    ╚██╔╝  ██║   ██║██╔══╝  ██║╚██╗██║   
-███████╗███████║███████╗   ██║      ██║  ██╗███████╗   ██║   ╚██████╔╝███████╗██║ ╚████║   
-╚══════╝╚══════╝╚══════╝   ╚═╝      ╚═╝  ╚═╝╚══════╝   ╚═╝    ╚═════╝ ╚══════╝╚═╝  ╚═══╝                                                                      
-                                                Project Version: {VERSION[0]}
-                                                Project Devs: rzc0d3r, AdityaGarg8, k0re,
-                                                              Fasjeit, alejanpa17, Ischunddu,
-                                                              soladify, AngryBonk, Xoncia
-"""
 if '--no-logo' in sys.argv:
     LOGO = f"ESET KeyGen {VERSION[0]} by rzc0d3r\n"
 if datetime.datetime.now().day == 6 and datetime.datetime.now().month == 8: # Birthday of rzc0d3r
@@ -50,41 +91,6 @@ if datetime.datetime.now().day == 6 and datetime.datetime.now().month == 8: # Bi
         colored_logo += '\n'
     colored_logo += f'{Fore.GREEN}rzc0d3r{Fore.RESET} celebrates his {Fore.LIGHTRED_EX}birthday{Fore.RESET} today!!! :)\n'
     LOGO = colored_logo
-
-# -- Quick settings [for Developers to quickly change behavior without changing all files] --
-DEFAULT_EMAIL_API = 'developermail'
-AVAILABLE_EMAIL_APIS = ['1secmail', '10minutemail', 'guerrillamail', 'developermail', 'mailticking']
-WEB_WRAPPER_EMAIL_APIS = ['10minutemail', 'guerrillamail', 'mailticking']
-EMAIL_API_CLASSES = {
-    'guerrillamail': GuerRillaMailAPI,
-    '10minutemail': TenMinuteMailAPI,           
-    '1secmail': OneSecEmailAPI,
-    'developermail': DeveloperMailAPI,
-    'mailticking': MailTickingAPI
-}
-
-args = {
-    'chrome': True,
-    'firefox': False,
-    'edge': False,
-
-    'key': True,
-    'small_business_key': False,
-    'endpoint_key': False,
-    'account': False,
-    'protecthub_account': False,
-    'only_webdriver_update': False,
-    'update': False,
-
-    'skip_webdriver_menu': False,
-    'no_headless': False,
-    'custom_browser_location': '',
-    'email_api': DEFAULT_EMAIL_API,
-    'custom_email_api': False,
-    'skip_update_check': False,
-    'no_logo': False,
-    'disable_progress_bar': False
-}
 
 def RunMenu():
     MainMenu = ViewMenu(LOGO+'\n---- Main Menu ----')
@@ -104,7 +110,7 @@ def RunMenu():
             args,
             title='Modes of operation',
             action='store_true',
-            args_names=['key', 'small-business-key', 'endpoint-key', 'account', 'protecthub-account', 'only-webdriver-update', 'update'],
+            args_names=['key', 'small-business-key', 'endpoint-key', 'vpn-codes', 'account', 'protecthub-account', 'only-webdriver-update', 'update'],
             default_value='key')
     )
     SettingMenu.add_item(
@@ -166,15 +172,34 @@ def RunMenu():
             args_names='disable_progress_bar'
         )
     )
-    SettingMenu.add_item(MenuAction('Back', MainMenu))
+    SettingMenu.add_item(
+        OptionAction(
+            args,
+            title='--disable-output-file',
+            action='bool_switch',
+            args_names='disable_output_file'
+        )
+    )
+    SettingMenu.add_item(
+        OptionAction(
+            args,
+            title='--repeat',
+            action='manual_input',
+            args_names='repeat',
+            default_value=1,
+            data_type=int,
+            data_range=list(range(1, MAX_REPEATS_LIMIT))
+        )
+    )
+    SettingMenu.add_item(MenuAction('Back', SettingMenu.close))
     MainMenu.add_item(MenuAction('Settings', SettingMenu))
-    MainMenu.add_item(MenuAction(f'Do it, damn it!', main))
+    MainMenu.add_item(MenuAction('Start', MainMenu.close))
     MainMenu.add_item(MenuAction('Exit', sys.exit))
     MainMenu.view()
 
 def parse_argv():
     print(LOGO)
-    if len(sys.argv) == 1: # Menu
+    if len(sys.argv) == 1: # for MBCI mode
         RunMenu()
     else: # CLI
         args_parser = argparse.ArgumentParser()
@@ -189,6 +214,7 @@ def parse_argv():
         args_modes.add_argument('--key', action='store_true', help='Creating a license key for ESET Smart Security Premium')
         args_modes.add_argument('--small-business-key', action='store_true', help='Creating a license key for ESET Small Business Security (1 key - 5 devices)')
         args_modes.add_argument('--endpoint-key', action='store_true', help='Creating a license key for ESET Endpoint Security')
+        args_modes.add_argument('--vpn-codes', action='store_true', help='Creating 10 codes for ESET VPN + 1 ESET Small Business Security key')
         args_modes.add_argument('--account', action='store_true', help='Creating a ESET HOME Account (To activate the free trial version)')
         args_modes.add_argument('--protecthub-account', action='store_true', help='Creating a ESET ProtectHub Account (To activate the free trial version)')
         args_modes.add_argument('--only-webdriver-update', action='store_true', help='Updates/installs webdrivers and browsers without generating account and license key')
@@ -202,16 +228,20 @@ def parse_argv():
         args_parser.add_argument('--skip-update-check', action='store_true', help='Skips checking for program updates')
         args_parser.add_argument('--no-logo', action='store_true', help='Replaces ASCII-Art with plain text')
         args_parser.add_argument('--disable-progress-bar', action='store_true', help='Disables the webdriver download progress bar')
-        args_parser.add_argument('--token', help='Token value')
+        args_parser.add_argument('--disable-output-file', action='store_true', help='Disables the output txt file generation')
+        args_parser.add_argument('--repeat', type=int, default=1, help=f'Specifies how many times to repeat generation (Accepts numbers from 1 to {MAX_REPEATS_LIMIT})')
         try:
             global args
             args = vars(args_parser.parse_args())
+            if args['repeat'] < 1 or args['repeat'] > MAX_REPEATS_LIMIT:
+                print(f'--repeat argument accepts numbers only from 1 to {MAX_REPEATS_LIMIT}!!!')
+                raise
         except:
             time.sleep(3)
             sys.exit(-1)
 
-def main():
-    if len(sys.argv) == 1: # for Menu
+def main(disable_exit=False):
+    if len(sys.argv) == 1 and not disable_exit: # for MBCI mode
         print()
     try:
         # changing input arguments for special cases
@@ -223,11 +253,6 @@ def main():
                 if not args['custom_email_api']:
                     if args['email_api'] not in ['mailticking', 'developermail']:
                         raise RuntimeError('--endpoint-key, --protecthub-account works ONLY if you use the --custom-email-api argument or the following Email APIs: mailticking, developermail!!!')
-        # check internet connection
-        try:
-            requests.get('https://www.google.com', timeout=10, allow_redirects=True)
-        except:
-            raise RuntimeError("Check your internet connection!!!")
         # check program updates
         if args['update']:
             print(f'{Fore.LIGHTMAGENTA_EX}-- Updater --{Fore.RESET}\n')
@@ -256,8 +281,6 @@ def main():
         # initialization and configuration of everything necessary for work            
         driver = None
         webdriver_path = None
-        token_value = args['token']
-        bot = telebot.TeleBot(token_value, parse_mode='MARKDOWNv2')
         browser_name = GOOGLE_CHROME
         if args['firefox']:
             browser_name = MOZILLA_FIREFOX
@@ -307,7 +330,7 @@ def main():
         if email_obj.email is not None:
             eset_password = dataGenerator(10)
             # ESET HOME
-            if args['account'] or args['key'] or args['small_business_key']:
+            if args['account'] or args['key'] or args['small_business_key'] or args['vpn_codes']:
                 ER_obj = ER(email_obj, eset_password, driver)
                 ER_obj.createAccount()
                 ER_obj.confirmAccount()
@@ -320,7 +343,7 @@ def main():
                         ''
                 ])
                 output_filename = 'ESET ACCOUNTS.txt'
-                if args['key'] or args['small_business_key']:
+                if args['key'] or args['small_business_key'] or args['vpn_codes']:
                     output_filename = 'ESET KEYS.txt'
                     EK_obj = EK(email_obj, driver, 'ESET HOME' if args['key'] else 'SMALL BUSINESS')
                     EK_obj.sendRequestForKey()
@@ -337,8 +360,27 @@ def main():
                         '-------------------------------------------------',
                         ''
                     ])
-                    output_line = f'\n🔸 Product: ||{license_name}||\n🕐 Expire: ||{license_out_date}||\n🔐 License: `{license_key}`\n'
-                    bot.send_message(-1001219056300, output_line + "@LicenseForAll")
+                    if args['vpn_codes']:
+                        EV_obj = EV(email_obj, driver, ER_obj.window_handle)
+                        EV_obj.sendRequestForVPNCodes()
+                        vpn_codes = EV_obj.getVPNCodes()
+                        if not args['custom_email_api']:
+                            vpn_codes_line = ', '.join(vpn_codes)
+                            output_line = '\n'.join([
+                                '',
+                                '-------------------------------------------------',
+                                f'Account Email: {email_obj.email}',
+                                f'Account Password: {eset_password}',
+                                '',
+                                f'License Name: {license_name}',
+                                f'License Key: {license_key}',
+                                f'License Out Date: {license_out_date}',
+                                '',
+                                f'VPN Codes: {vpn_codes_line}',
+                                '-------------------------------------------------',
+                                ''
+                            ])
+
             # ESET ProtectHub
             elif args['protecthub_account'] or args['endpoint_key']:
                 EPHR_obj = EPHR(email_obj, eset_password, driver)
@@ -371,14 +413,14 @@ def main():
                             '---------------------------------------------------------------------',
                             ''
                         ])
-                    output_line = f'\n🔸 Product: ||{license_name}||\n🕐 Expire: ||{license_out_date}||\n🔐 License: `{license_key}`\n'
-                    bot.send_message(-1001219056300, output_line + "@LicenseForAll")
+
             # end
             console_log(output_line)
-            date = datetime.datetime.now()
-            f = open(f"{str(date.day)}.{str(date.month)}.{str(date.year)} - "+output_filename, 'a')
-            f.write(output_line)
-            f.close()
+            if not args['disable_output_file']:
+                date = datetime.datetime.now()
+                f = open(f"{str(date.day)}.{str(date.month)}.{str(date.year)} - "+output_filename, 'a')
+                f.write(output_line)
+                f.close()
         else:
             console_log('Mail registration was not completed, try using a different Email API!\n', ERROR)
         
@@ -387,15 +429,30 @@ def main():
         if str(type(E)).find('selenium') and traceback_string.find('Stacktrace:') != -1: # disabling stacktrace output
             traceback_string = traceback_string.split('Stacktrace:', 1)[0]
         console_log(traceback_string, ERROR)
-    if len(sys.argv) == 1:
-        input('Press Enter to exit...')
-    else:
-        time.sleep(3) # exit-delay
+    if not disable_exit:
+        if len(sys.argv) == 1:
+            input('Press Enter to exit...')
+        else:
+            time.sleep(3) # exit-delay
     if globals().get('driver', None) is not None:
         driver.quit()
-    sys.exit()
+    if not disable_exit:
+        sys.exit()
 
 if __name__ == '__main__':
-    parse_argv() # if Menu, the main function will be called in automatic mode
-    if len(sys.argv) > 1: # CLI
+    parse_argv()
+    if args['repeat'] == 1:
         main()
+    else:
+        for i in range(args['repeat']):
+            try:
+                print(f'\n{Fore.MAGENTA}------------ Initializing of {Fore.YELLOW}{i+1} {Fore.MAGENTA}start ------------{Fore.RESET}\n')
+                if i == 0: # the first run sets up the environment for subsequent runs, speeding them up
+                    main(disable_exit=True)
+                    args['skip_update_check'] = True
+                elif i+1 == args['repeat']:
+                    main()
+                else:
+                    main(disable_exit=True)
+            except KeyboardInterrupt:
+                continue
