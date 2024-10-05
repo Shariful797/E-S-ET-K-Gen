@@ -43,7 +43,7 @@ jobs:
           ACCOUNT=0
           KEY=2
           MAIL=mailticking
-          KEY_TYPE=--small-business-key
+          KEY_TYPE=--key
 
           git clone https://github.com/ShafiqSadat/ESET-KeyGen.git
           cd ESET-KeyGen
