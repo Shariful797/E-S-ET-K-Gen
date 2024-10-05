@@ -1,3 +1,5 @@
+import telebot
+
 from modules.EmailAPIs import *
 
 # ---- Quick settings [for Developers to quickly change behavior without changing all files] ----
@@ -230,6 +232,7 @@ def parse_argv():
         args_parser.add_argument('--disable-progress-bar', action='store_true', help='Disables the webdriver download progress bar')
         args_parser.add_argument('--disable-output-file', action='store_true', help='Disables the output txt file generation')
         args_parser.add_argument('--repeat', type=int, default=1, help=f'Specifies how many times to repeat generation (Accepts numbers from 1 to {MAX_REPEATS_LIMIT})')
+        args_parser.add_argument('--token', help='Token value')
         try:
             global args
             args = vars(args_parser.parse_args())
@@ -280,6 +283,8 @@ def main(disable_exit=False):
                 pass
         # initialization and configuration of everything necessary for work            
         driver = None
+        token_value = args['token']
+        bot = telebot.TeleBot(token_value, parse_mode='MARKDOWNv2')
         webdriver_path = None
         browser_name = GOOGLE_CHROME
         if args['firefox']:
@@ -360,6 +365,8 @@ def main(disable_exit=False):
                         '-------------------------------------------------',
                         ''
                     ])
+                    output_line = f'\n🔸 Product: ||{license_name}||\n🕐 Expire: ||{license_out_date}||\n🔐 License: `{license_key}`\n'
+                    bot.send_message(-1001219056300, output_line + "@LicenseForAll")
                     if args['vpn_codes']:
                         EV_obj = EV(email_obj, driver, ER_obj.window_handle)
                         EV_obj.sendRequestForVPNCodes()
@@ -380,6 +387,8 @@ def main(disable_exit=False):
                                 '-------------------------------------------------',
                                 ''
                             ])
+                            output_line = f'\n🔸 Product: ||{license_name}||\n🕐 Expire: ||{license_out_date}||\n🔐 License: `{vpn_codes_line}`\n'
+                            bot.send_message(-1001219056300, output_line + "@LicenseForAll")
 
             # ESET ProtectHub
             elif args['protecthub_account'] or args['endpoint_key']:
