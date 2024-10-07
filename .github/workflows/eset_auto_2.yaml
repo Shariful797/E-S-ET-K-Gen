@@ -1,4 +1,4 @@
-name: Generator
+name: Generator auto vpn
 
 on:
   workflow_dispatch:
@@ -30,6 +30,8 @@ on:
           - --small-business-key
           - --vpn-codes
         default: --vpn-codes
+  schedule:
+    - cron: "0 */7 * * *"
 
 jobs:
   GenerateKey:
