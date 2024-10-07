@@ -391,12 +391,12 @@ def main(disable_exit=False):
                         if not args['custom_email_api']:
                             vpn_title = "ESET VPN Free License Key for 30 days"
                             vpn_sub_title = "Over 60 locations to choose"
-                            proof = "Comment activation Screenshot as of proof."
-                            important_note = ">❤️Give Reaction❤️"
+                            #proof = "Comment activation Screenshot as of proof."
+                            #important_note = ">❤️Give Reaction❤️"
                             photo_path = 'img/ESET_VPN.png'
                             stay_tuned = "Stay Tuned"
                             mention = "@FreeLicense4All"
-                            vpn_codes_line = '\n\n'.join([f'Key: `{vpn_code}`' for vpn_code in vpn_codes])
+                            vpn_codes_line = '\n'.join([f'Key: `{vpn_code}`' for vpn_code in vpn_codes])
                             output_line = '\n'.join([
                                 '',
                                 '-------------------------------------------------',
@@ -412,7 +412,8 @@ def main(disable_exit=False):
                                 ''
                             ])
                             print(output_line)
-                            full_message = f"{vpn_title}\n{vpn_sub_title}\n\n\n{vpn_codes_line}\n\n\n{important_note}\n\n\n{proof}\n\n\n{stay_tuned}\n{mention}\n"
+                            #full_message = f"{vpn_title}\n{vpn_sub_title}\n\n\n{vpn_codes_line}\n\n\n{important_note}\n\n\n{proof}\n\n\n{stay_tuned}\n{mention}\n"
+                            full_message = f"{vpn_title}\n{vpn_sub_title}\n\n\n{vpn_codes_line}\n\n\n{stay_tuned}\n{mention}\n"
                             try:
                                 with open(photo_path, 'rb') as photo:
                                     bot.send_photo(chat_id=614469986, photo=photo, caption=full_message, parse_mode='MARKDOWNv2')
