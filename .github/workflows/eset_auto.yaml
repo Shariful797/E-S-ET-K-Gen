@@ -39,7 +39,7 @@ jobs:
       - name: Generate key
         run: |
           ACCOUNT=0
-          KEY=2
+          KEY=1
           MAIL=mailticking
           KEY_TYPE=--key
 
