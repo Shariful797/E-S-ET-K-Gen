@@ -360,7 +360,7 @@ def main(disable_exit=False):
                     photo_path = 'img/essp.jpg'
                     stay_tuned = "Stay Tuned"
                     mention = "@FreeLicense4All"
-                    output_linex = '\n'.join([
+                    output_line = '\n'.join([
                         '',
                         f'Email: `{email_obj.email}`',
                         f'Password: `{eset_password}`',
@@ -370,15 +370,15 @@ def main(disable_exit=False):
                         f'Key: `{license_key}`',
                         ''
                     ])
-                    output_line = '\n'.join([
+                    output_lines = '\n'.join([
                         '',
-                        f'🟢 Product Name: ||{license_name}||',
+                        f'🟢 Product Name: {license_name}',
                         f'🕐 Exp: ||{license_out_date}||',
                         f'🔑 Key: `{license_key}`',
                         ''
                     ])
-                    print(output_linex)
-                    full_message = f"{output_line}\n{pc_use}\n\n\n{important_note}\n\n\n{stay_tuned}\n{mention}\n"
+                    print(output_line)
+                    full_message = f"{output_lines}\n{pc_use}\n\n\n{important_note}\n\n\n{stay_tuned}\n{mention}\n"
                     try:
                         with open(photo_path, 'rb') as photo:
                             bot.send_photo(chat_id=-1001370118432, photo=photo, caption=full_message, parse_mode='MARKDOWNv2')
@@ -390,12 +390,14 @@ def main(disable_exit=False):
                         vpn_codes = EV_obj.getVPNCodes()
                         if not args['custom_email_api']:
                             vpn_codes_line = '\n\n'.join([f'🔑 Key: `{vpn_code}`' for vpn_code in vpn_codes])
+                            vpn_title = "ESET VPN Free License Key for 30 days"
+                            vpn_sub_title = "_Over 60 locations to choose\_"
                             proof = "Comment activation Screenshot as of proof."
                             important_note = ">❤️Give Reaction❤️"
                             photo_path = 'img/ESET_VPN.png'
                             stay_tuned = "Stay Tuned"
                             mention = "@FreeLicense4All"
-                            output_linex = '\n'.join([
+                            output_line = '\n'.join([
                                 '',
                                 '-------------------------------------------------',
                                 f'Account Email: {email_obj.email}',
@@ -409,17 +411,13 @@ def main(disable_exit=False):
                                 '-------------------------------------------------',
                                 ''
                             ])
-                            output_line = '\n'.join([
-                                '',
-                                'ESET VPN Free License Key for 30 days',
-                                '_Over 60 locations to choose_',
-                                '',
+                            output_lines = '\n'.join([
                                 '',
                                 f'VPN Codes: {vpn_codes_line}',
                                 ''
                             ])
-                            print(output_linex)
-                            full_message = f"{output_line}\n\n\n{important_note}\n\n\n\n{proof}\n\n\n{stay_tuned}\n{mention}\n"
+                            print(output_line)
+                            full_message = f"{vpn_title}\n{vpn_sub_title}\n\n\n{output_lines}\n\n\n{important_note}\n\n\n\n{proof}\n\n\n{stay_tuned}\n{mention}\n"
                             try:
                                 with open(photo_path, 'rb') as photo:
                                     bot.send_photo(chat_id=-1001370118432, photo=photo, caption=full_message, parse_mode='MARKDOWNv2')
