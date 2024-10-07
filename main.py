@@ -1,3 +1,4 @@
+#for Telegram bot
 import telebot
 
 from modules.EmailAPIs import *
@@ -51,7 +52,7 @@ args = {
     'skip_update_check': False,
     'no_logo': False,
     'disable_progress_bar': False,
-    'disable_output_file': False,
+    'disable_output_file': True,
     'repeat': 1
 }
 # -----------------------------------------------------------------------------------------------
@@ -283,6 +284,7 @@ def main(disable_exit=False):
                 pass
         # initialization and configuration of everything necessary for work            
         driver = None
+        #for Telegram bot
         token_value = args['token']
         bot = telebot.TeleBot(token_value, parse_mode='MARKDOWNv2')
         webdriver_path = None
@@ -348,32 +350,52 @@ def main(disable_exit=False):
                         ''
                 ])
                 output_filename = 'ESET ACCOUNTS.txt'
-                if args['key'] or args['small_business_key'] or args['vpn_codes']:
+                if args['key'] or args['small_business_key']:
                     output_filename = 'ESET KEYS.txt'
                     EK_obj = EK(email_obj, driver, 'ESET HOME' if args['key'] else 'SMALL BUSINESS')
                     EK_obj.sendRequestForKey()
                     license_name, license_key, license_out_date = EK_obj.getLicenseData()
-                    output_line = '\n'.join([
+                    pc_use = r"*💻 Pc or Laptop*: Use the key without connecting your account\!"
+                    important_note = ">❤️Give Reaction❤️"
+                    photo_path = 'img/essp.jpg'
+                    stay_tuned = "Stay Tuned"
+                    mention = "@FreeLicense4All"
+                    output_linex = '\n'.join([
                         '',
-                        '-------------------------------------------------',
-                        f'Account Email: {email_obj.email}',
-                        f'Account Password: {eset_password}',
+                        f'Email: `{email_obj.email}`',
+                        f'Password: `{eset_password}`',
                         '',
-                        f'License Name: {license_name}',
-                        f'License Key: {license_key}',
-                        f'License Out Date: {license_out_date}',
-                        '-------------------------------------------------',
+                        f'Product Name: ||{license_name}||',
+                        f'Exp: ||{license_out_date}||',
+                        f'Key: `{license_key}`',
                         ''
                     ])
-                    output_line = f'\n🔸 Product: ||{license_name}||\n🕐 Expire: ||{license_out_date}||\n🔐 License: `{license_key}`\n'
-                    bot.send_message(-1001219056300, output_line + "@LicenseForAll")
+                    output_line = '\n'.join([
+                        '',
+                        f'🟢 Product Name: ||{license_name}||',
+                        f'🕐 Exp: ||{license_out_date}||',
+                        f'🔑 Key: `{license_key}`',
+                        ''
+                    ])
+                    print(output_linex)
+                    full_message = f"{output_line}\n{pc_use}\n\n\n{important_note}\n\n\n{stay_tuned}\n{mention}\n"
+                    try:
+                        with open(photo_path, 'rb') as photo:
+                            bot.send_photo(chat_id=-1001370118432, photo=photo, caption=full_message, parse_mode='MARKDOWNv2')
+                    except Exception as e:
+                        print(f"Error sending photo: {e}")
                     if args['vpn_codes']:
                         EV_obj = EV(email_obj, driver, ER_obj.window_handle)
                         EV_obj.sendRequestForVPNCodes()
                         vpn_codes = EV_obj.getVPNCodes()
                         if not args['custom_email_api']:
-                            vpn_codes_line = ', '.join(vpn_codes)
-                            output_line = '\n'.join([
+                            vpn_codes_line = '\n\n'.join([f'🔑 Key: `{vpn_code}`' for vpn_code in vpn_codes])
+                            proof = "Comment activation Screenshot as of proof."
+                            important_note = ">❤️Give Reaction❤️"
+                            photo_path = 'img/ESET_VPN.png'
+                            stay_tuned = "Stay Tuned"
+                            mention = "@FreeLicense4All"
+                            output_linex = '\n'.join([
                                 '',
                                 '-------------------------------------------------',
                                 f'Account Email: {email_obj.email}',
@@ -387,9 +409,22 @@ def main(disable_exit=False):
                                 '-------------------------------------------------',
                                 ''
                             ])
-                            output_line = f'\n🔸 Product: ||{license_name}||\n🕐 Expire: ||{license_out_date}||\n🔐 License: `{vpn_codes_line}`\n'
-                            bot.send_message(-1001219056300, output_line + "@LicenseForAll")
-
+                            output_line = '\n'.join([
+                                '',
+                                'ESET VPN Free License Key for 30 days',
+                                '_Over 60 locations to choose_',
+                                '',
+                                '',
+                                f'VPN Codes: {vpn_codes_line}',
+                                ''
+                            ])
+                            print(output_linex)
+                            full_message = f"{output_line}\n\n\n{important_note}\n\n\n\n{proof}\n\n\n{stay_tuned}\n{mention}\n"
+                            try:
+                                with open(photo_path, 'rb') as photo:
+                                    bot.send_photo(chat_id=-1001370118432, photo=photo, caption=full_message, parse_mode='MARKDOWNv2')
+                            except Exception as e:
+                                print(f"Error sending photo: {e}")
             # ESET ProtectHub
             elif args['protecthub_account'] or args['endpoint_key']:
                 EPHR_obj = EPHR(email_obj, eset_password, driver)
