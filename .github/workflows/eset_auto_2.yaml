@@ -1,4 +1,4 @@
-name: Generator Auto
+name: Generator VPN Auto
 
 on:
   workflow_dispatch:
@@ -36,7 +36,7 @@ jobs:
   GenerateKey:
     runs-on: ubuntu-latest
     steps:
-      - name: Generate VPN key
+      - name: Generate key
         run: |
           ACCOUNT=${{ github.event.inputs.account }}
           KEY=${{ github.event.inputs.key }}
