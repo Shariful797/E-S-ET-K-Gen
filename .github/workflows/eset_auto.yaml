@@ -22,26 +22,26 @@ on:
         - mailticking
         default: mailticking
       key_type:
-        description: 'Modes of operation'
+        description: 'Choose the key type'
         required: true
         type: choice
         options:
         - --key
         - --small-business-key
-        - --vpn-codes
         default: --key
   schedule:
     - cron: "30 */2 * * *"
+
 jobs:
   GenerateKey:
     runs-on: ubuntu-latest
     steps:
       - name: Generate key
         run: |
-          ACCOUNT=${{ github.event.inputs.account }}
-          KEY=${{ github.event.inputs.key }}
-          MAIL=${{ github.event.inputs.mail }}
-          KEY_TYPE=${{ github.event.inputs.key_type }}
+          ACCOUNT=0
+          KEY=2
+          MAIL=mailticking
+          KEY_TYPE=--key
 
           git clone https://github.com/Shariful797/ESET-KeyGen.git
           cd ESET-KeyGen
