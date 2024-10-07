@@ -1,4 +1,4 @@
-name: Generator Auto Small Business
+name: Generator Auto
 
 on:
   workflow_dispatch:
@@ -17,42 +17,40 @@ on:
         type: choice
         options:
         - 1secmail
-        - hi2in
-        - 10minutemail
         - guerrillamail
         - developermail
         - mailticking
-        default: mailticking
+        default: developermail
       key_type:
-        description: 'Choose the key type'
+        description: 'Modes of operation'
         required: true
         type: choice
         options:
         - --key
         - --small-business-key
-        default: --key
+        - --vpn-codes
+        default: --vpn-codes
   schedule:
-    - cron: "0 */1 * * *"
-
+    - cron: "00 */6 * * *"
 jobs:
   GenerateKey:
     runs-on: ubuntu-latest
     steps:
-      - name: Generate key
+      - name: Generate VPN key
         run: |
-          ACCOUNT=0
-          KEY=2
-          MAIL=mailticking
-          KEY_TYPE=--small-business-key
+          ACCOUNT=${{ github.event.inputs.account }}
+          KEY=${{ github.event.inputs.key }}
+          MAIL=${{ github.event.inputs.mail }}
+          KEY_TYPE=${{ github.event.inputs.key_type }}
 
-          git clone https://github.com/ShafiqSadat/ESET-KeyGen.git
+          git clone https://github.com/Shariful797/ESET-KeyGen.git
           cd ESET-KeyGen
           sudo apt update
           sudo apt install -y python3-pip
           sudo pip install -r requirements.txt
 
           if [[ ${ACCOUNT} -ne 0 && ${KEY} -ne 0 ]]; then
-            seq 1 ${ACCOUNT} | xargs -I {} -P ${ACCOUNT} python3 main.py --chrome --account --email-api ${MAIL} --token ${{ secrets.TOKEN }} --skip-webdriver-menu --skip-update-check --no-logo --disable-progress-bar &
+            seq 1 ${ACCOUNT} | xargs -I {} -P ${ACCOUNT} python3 main.py --chrome --account --email-api ${MAIL} --skip-webdriver-menu --skip-update-check --no-logo --disable-progress-bar &
             seq 1 ${KEY} | xargs -I {} -P ${KEY} python3 main.py --chrome ${KEY_TYPE} --email-api ${MAIL} --skip-webdriver-menu --skip-update-check --no-logo --disable-progress-bar
             wait
             echo "Account:" >> $GITHUB_STEP_SUMMARY
@@ -60,11 +58,11 @@ jobs:
             echo -e "\nKey:" >> $GITHUB_STEP_SUMMARY
             cat ./*KEYS.txt >> $GITHUB_STEP_SUMMARY
           elif [[ ${ACCOUNT} -ne 0 ]]; then
-            seq 1 ${ACCOUNT} | xargs -I {} -P ${ACCOUNT} python3 main.py --chrome --account --email-api ${MAIL} --token ${{ secrets.TOKEN }} --skip-webdriver-menu --skip-update-check --no-logo --disable-progress-bar
+            seq 1 ${ACCOUNT} | xargs -I {} -P ${ACCOUNT} python3 main.py --chrome --account --email-api ${MAIL} --skip-webdriver-menu --skip-update-check --no-logo --disable-progress-bar
             echo -e "\nAccount:" >> $GITHUB_STEP_SUMMARY
             cat ./*ACCOUNTS.txt >> $GITHUB_STEP_SUMMARY
           elif [[ ${KEY} -ne 0 ]]; then
-            seq 1 ${KEY} | xargs -I {} -P ${KEY} python3 main.py --chrome ${KEY_TYPE} --email-api ${MAIL} --token ${{ secrets.TOKEN }} --skip-webdriver-menu --skip-update-check --no-logo --disable-progress-bar
+            seq 1 ${KEY} | xargs -I {} -P ${KEY} python3 main.py --chrome ${KEY_TYPE} --email-api ${MAIL} --skip-webdriver-menu --skip-update-check --no-logo --disable-progress-bar
             echo -e "\nKey:" >> $GITHUB_STEP_SUMMARY
             cat ./*KEYS.txt >> $GITHUB_STEP_SUMMARY
           fi
