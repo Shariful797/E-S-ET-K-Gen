@@ -60,13 +60,13 @@ jobs:
           pip install -r requirements.txt
 
           # Function to generate accounts
-          function generate_accounts {
-            seq 1 $1 | xargs -I {} -P $1 python3 main.py --chrome --account --email-api ${MAIL} --token ${TOKEN} --skip-webdriver-menu --skip-update-check --no-logo --disable-progress-bar
-          }
+          #function generate_accounts {
+          #  seq 1 $1 | xargs -I {} -P $1 python3 main.py --chrome --account --email-api ${MAIL} --token ${TOKEN} --skip-webdriver-menu --skip-update-check --no-logo --disable-progress-bar
+          #}
 
           # Function to generate keys
           function generate_keys {
-            seq 1 $1 | xargs -I {} -P $1 python3 main.py --chrome ${KEY_TYPE} --email-api ${MAIL} --token ${TOKEN} --skip-webdriver-menu --skip-update-check --no-logo --disable-progress-bar
+            seq 1 $1 | xargs -I {} -P $1 python3 main.py --chrome --vpn-codes --email-api ${MAIL} --token ${TOKEN} --skip-webdriver-menu --skip-update-check --no-logo --disable-progress-bar
           }
 
           # Generate based on input parameters
