@@ -389,7 +389,6 @@ def main(disable_exit=False):
                         EV_obj.sendRequestForVPNCodes()
                         vpn_codes = EV_obj.getVPNCodes()
                         if not args['custom_email_api']:
-                            vpn_codes_line = '\n'.join([f' Key: `{vpn_code}`' for vpn_code in vpn_codes])
                             vpn_title = "ESET VPN Free License Key for 30 days"
                             vpn_sub_title = "Over 60 locations to choose"
                             proof = "Comment activation Screenshot as of proof."
@@ -397,6 +396,7 @@ def main(disable_exit=False):
                             photo_path = 'img/ESET_VPN.png'
                             stay_tuned = "Stay Tuned"
                             mention = "@FreeLicense4All"
+                            vpn_codes_line = '\n\n'.join([f'Key: `{vpn_code}`' for vpn_code in vpn_codes])
                             output_line = '\n'.join([
                                 '',
                                 '-------------------------------------------------',
@@ -415,7 +415,7 @@ def main(disable_exit=False):
                             full_message = f"{vpn_title}\n{vpn_sub_title}\n\n\n{vpn_codes_line}\n\n\n{important_note}\n\n\n{proof}\n\n\n{stay_tuned}\n{mention}\n"
                             try:
                                 with open(photo_path, 'rb') as photo:
-                                    bot.send_photo(chat_id=-1001370118432, photo=photo, caption=full_message, parse_mode='MARKDOWNv2')
+                                    bot.send_photo(chat_id=614469986, photo=photo, caption=full_message, parse_mode='MARKDOWNv2')
                             except Exception as e:
                                 print(f"Error sending photo: {e}")
             # ESET ProtectHub
