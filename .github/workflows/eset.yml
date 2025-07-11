@@ -41,7 +41,7 @@ on:
         - macOS
         - Linux
         - Windows
-        default: macOS
+        default: Windows
       branch:
         description: "Repository branch (don't touch it if you don't know what it is!!!)"
         required: false
