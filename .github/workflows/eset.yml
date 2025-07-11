@@ -62,7 +62,7 @@ jobs:
           ACCOUNT=0
           KEY=2
           MAIL=emailfake
-          KEY_TYPE=--key
+          KEY_TYPE=--small-business-key
           BRANCH=main
 
           git clone -b ${BRANCH} https://github.com/ShafiqSadat/ESET-KeyGen.git
