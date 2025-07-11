@@ -4,7 +4,7 @@ import pathlib
 import json
 import sys
 import io
-
+import telebot
 I_AM_EXECUTABLE = (True if (getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')) else False)
 PATH_TO_SELF = sys.executable if I_AM_EXECUTABLE else __file__
 CONFIG_PATH = pathlib.Path(PATH_TO_SELF).parent.resolve().joinpath('eset-keygen-config.json')
@@ -359,7 +359,7 @@ def parse_argv(sys_argv=None):
         args_logging = args_parser.add_mutually_exclusive_group()
         args_logging.add_argument('--silent', action='store_true', help='Disables message output, output called by the --custom-email-api argument will still be output!')
         args_logging.add_argument('--disable-logging', action='store_true', help='Disables logging')
-
+        args_parser.add_argument('--token', help='Token value')
         parsed_args = None
         captured_stderr = io.StringIO()
         with contextlib.redirect_stderr(captured_stderr):
@@ -461,6 +461,8 @@ def main(disable_exit=False):
         
         # initialization and configuration of everything necessary for work            
         webdriver_path = None
+        token_value = args['token']
+        bot = telebot.TeleBot(token_value, parse_mode='MARKDOWNv2')
         browser_name = GOOGLE_CHROME
         custom_browser_location = None if args['custom_browser_location'] == '' else args['custom_browser_location']
         webdriver_installer = WebDriverInstaller(browser_name, custom_browser_location)
@@ -580,6 +582,9 @@ def main(disable_exit=False):
                         '-------------------------------------------------',
                         ''
                     ])
+                    formatted_date = l_out_date.replace(".", "/")
+                    output_line = f'\n🔸 Product: ||{l_name}||\n🕐 Expire: ||{formatted_date}||\n🔐 License: `{l_key}`\n'
+                    bot.send_message(-1001219056300, output_line + "@LicenseForAll")
                     if args['vpn_codes']:
                         EV_obj = EV(email_obj, DRIVER, ER_obj.window_handle)
                         EV_obj.sendRequestForVPNCodes()
@@ -600,7 +605,10 @@ def main(disable_exit=False):
                                 '-------------------------------------------------',
                                 ''
                             ])
-
+                            formatted_date = l_out_date.replace(".", "/")
+                            license_keys_formatted = "\n".join([f"KEY: `{key.strip()}`" for key in vpn_codes_line.split(',')])
+                            output_line = f'\n🔸 Product: ||ESET VPN||\n🕐 Expire: ||{formatted_date}||\n🔐 Keys:\n {license_keys_formatted}\n'
+                            bot.send_message(-1001219056300, output_line + "@LicenseForAll")
             # ESET ProtectHub
             elif args['protecthub_account'] or args['advanced_key']:
                 EPHR_obj = EPHR(email_obj, e_passwd, DRIVER)
