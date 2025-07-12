@@ -38,16 +38,16 @@ on:
           - --small-business-key
         default: --key
       os:
-        description: 'Operating System of runner'
+        description: 'GitHub Runner Label (ubuntu-latest, macos-latest, windows-latest)'
         required: true
         type: choice
         options:
-          - macOS
-          - Linux
-          - Windows
-        default: Linux
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+        default: ubuntu-latest
       branch:
-        description: "Repository branch"
+        description: "Repository branch (don't touch it if you don't know what it is!!!)"
         required: false
         type: choice
         options:
@@ -56,60 +56,11 @@ on:
         default: main
 
 jobs:
-  set-os:
-    runs-on: ubuntu-latest
-    outputs:
-      selected-os: ${{ steps.set.outputs.selected-os }}
-    steps:
-      - name: Determine selected OS
-        id: set
-        shell: bash
-        run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            case "${{ github.event.inputs.os }}" in
-              macOS)
-                echo "selected-os=macos-latest" >> $GITHUB_OUTPUT
-                ;;
-              Linux)
-                echo "selected-os=ubuntu-latest" >> $GITHUB_OUTPUT
-                ;;
-              Windows)
-                echo "selected-os=windows-latest" >> $GITHUB_OUTPUT
-                ;;
-            esac
-          else
-            echo "selected-os=all" >> $GITHUB_OUTPUT
-          fi
-
   generate:
-    needs: set-os
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
-    
-          
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.os || 'ubuntu-latest' }}
     steps:
-      - name: Check OS Filter
-        shell: bash
-        run: |
-          echo "This job is running on: ${{ matrix.os }}"
-          echo "User selected: ${{ needs.set-os.outputs.selected-os }}"
-      - name: Skip if not selected OS
-        if: needs.set-os.outputs.selected-os != 'all' && needs.set-os.outputs.selected-os != matrix.os
-        run: |
-          echo "Skipping ${{ matrix.os }} since it doesn't match selected: ${{ needs.set-os.outputs.selected-os }}"
-          exit 0
-        shell: bash
-
-      - name: Checkout
-        if: needs.set-os.outputs.selected-os == 'all' || needs.set-os.outputs.selected-os == matrix.os
-        uses: actions/checkout@v4
-
       - name: Set Variables
         id: vars
-        shell: bash
-        if: needs.set-os.outputs.selected-os == 'all' || needs.set-os.outputs.selected-os == matrix.os
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             echo "account=${{ github.event.inputs.account }}" >> $GITHUB_OUTPUT
@@ -117,29 +68,27 @@ jobs:
             echo "mail=${{ github.event.inputs.mail }}" >> $GITHUB_OUTPUT
             echo "key_type=${{ github.event.inputs.key_type }}" >> $GITHUB_OUTPUT
             echo "branch=${{ github.event.inputs.branch }}" >> $GITHUB_OUTPUT
-            echo "os=${{ github.event.inputs.os }}" >> $GITHUB_OUTPUT
-            
           else
             echo "account=0" >> $GITHUB_OUTPUT
             echo "key=1" >> $GITHUB_OUTPUT
             echo "mail=emailfake" >> $GITHUB_OUTPUT
             echo "key_type=--key" >> $GITHUB_OUTPUT
             echo "branch=main" >> $GITHUB_OUTPUT
-            echo "os=Linux" >> $GITHUB_OUTPUT
           fi
 
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
       - name: Clone Repository
-        if: needs.set-os.outputs.selected-os == 'all' || needs.set-os.outputs.selected-os == matrix.os
-        run: git clone -b ${{ steps.vars.outputs.branch }} https://github.com/Shariful797/ESET-KeyGen.git
+        run: git clone -b "${{ steps.vars.outputs.branch }}" https://github.com/Shariful797/ESET-KeyGen.git
 
-
-      - name: Run Script (Linux/macOS)
-        if: (matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest') && (needs.set-os.outputs.selected-os == 'all' || needs.set-os.outputs.selected-os == matrix.os)
+      - name: Setup Python & Install Deps (Linux/macOS)
+        if: runner.os != 'Windows'
         shell: bash
         run: |
           cd ESET-KeyGen
-          if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-            brew install python || true
+          if [[ "$RUNNER_OS" == "macOS" ]]; then
+            brew install python@3.11 || true
           else
             sudo apt update
             sudo apt install -y python3-pip python3-venv
@@ -147,7 +96,13 @@ jobs:
           python3 -m venv venv
           source venv/bin/activate
           pip install -r requirements.txt
-          
+
+      - name: Run Script (Linux/macOS)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          cd ESET-KeyGen
+          source venv/bin/activate
           ACCOUNT="${{ steps.vars.outputs.account }}"
           KEY="${{ steps.vars.outputs.key }}"
           MAIL="${{ steps.vars.outputs.mail }}"
@@ -156,37 +111,39 @@ jobs:
           if [[ "$ACCOUNT" != "0" ]]; then
             python3 main.py --auto-detect-browser --account --email-api "$MAIL" --token "${{ secrets.TOKEN }}" --skip-update-check --no-logo --disable-progress-bar --disable-logging --repeat "$ACCOUNT"
           fi
+
           if [[ "$KEY" != "0" ]]; then
             python3 main.py --auto-detect-browser "$KEY_TYPE" --email-api "$MAIL" --token "${{ secrets.TOKEN }}" --skip-update-check --no-logo --disable-progress-bar --disable-logging --repeat "$KEY"
           fi
 
           echo "Account:" >> $GITHUB_STEP_SUMMARY
-          cat ./*ACCOUNTS.txt >> $GITHUB_STEP_SUMMARY 2>/dev/null || true
+          cat ./*ACCOUNTS.txt >> $GITHUB_STEP_SUMMARY 2>/dev/null || echo "None" >> $GITHUB_STEP_SUMMARY
           echo -e "\nKey:" >> $GITHUB_STEP_SUMMARY
-          cat ./*KEYS.txt >> $GITHUB_STEP_SUMMARY 2>/dev/null || true
+          cat ./*KEYS.txt >> $GITHUB_STEP_SUMMARY 2>/dev/null || echo "None" >> $GITHUB_STEP_SUMMARY
 
       - name: Run Script (Windows)
-        if: matrix.os == 'windows-latest' && (needs.set-os.outputs.selected-os == 'all' || needs.set-os.outputs.selected-os == matrix.os)
+        if: runner.os == 'Windows'
         shell: pwsh
         run: |
           cd ESET-KeyGen
           python -m venv venv
-          .\venv\Scripts\activate
           .\venv\Scripts\pip install -r requirements.txt
-          
+          .\venv\Scripts\Activate.ps1
+
           $ACCOUNT = "${{ steps.vars.outputs.account }}"
           $KEY = "${{ steps.vars.outputs.key }}"
           $MAIL = "${{ steps.vars.outputs.mail }}"
           $KEY_TYPE = "${{ steps.vars.outputs.key_type }}"
 
           if ($ACCOUNT -ne 0) {
-            python main.py --auto-detect-browser --account --email-api $MAIL --token ${{ secrets.TOKEN }} --skip-update-check --no-logo --disable-progress-bar --disable-logging --repeat $ACCOUNT
+            python3 main.py --auto-detect-browser --account --email-api "$MAIL" --token "${{ secrets.TOKEN }}" --skip-update-check --no-logo --disable-progress-bar --disable-logging --repeat "$ACCOUNT"
           }
+
           if ($KEY -ne 0) {
-            python main.py --auto-detect-browser $KEY_TYPE --email-api $MAIL --token ${{ secrets.TOKEN }} --skip-update-check --no-logo --disable-progress-bar --disable-logging --repeat $KEY
+            python3 main.py --auto-detect-browser "$KEY_TYPE" --email-api "$MAIL" --token "${{ secrets.TOKEN }}" --skip-update-check --no-logo --disable-progress-bar --disable-logging --repeat "$KEY"
           }
 
           echo "Account:" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
-          Get-Content -Path ./*ACCOUNTS.txt | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -ErrorAction SilentlyContinue
+          Get-Content -Path ./*ACCOUNTS.txt -ErrorAction SilentlyContinue | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
           echo "`nKey:" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
-          Get-Content -Path ./*KEYS.txt | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -ErrorAction SilentlyContinue
+          Get-Content -Path ./*KEYS.txt -ErrorAction SilentlyContinue | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
