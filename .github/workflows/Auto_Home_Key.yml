@@ -2,7 +2,7 @@ name: Auto Home Key Generator
 
 on:
   schedule:
-    - cron: "0 */2 * * *"  # Every 2 hours
+    - cron: "0 */2 * * *"
   workflow_dispatch:
     inputs:
       account:
@@ -38,7 +38,7 @@ on:
           - --small-business-key
         default: --key
       os:
-        description: 'GitHub Runner Label (ubuntu-latest, macos-latest, windows-latest)'
+        description: 'GitHub Runner Label'
         required: true
         type: choice
         options:
@@ -47,7 +47,7 @@ on:
           - windows-latest
         default: ubuntu-latest
       branch:
-        description: "Repository branch (don't touch it if you don't know what it is!!!)"
+        description: "Repository branch"
         required: false
         type: choice
         options:
@@ -82,7 +82,7 @@ jobs:
       - name: Clone Repository
         run: git clone -b "${{ steps.vars.outputs.branch }}" https://github.com/Shariful797/ESET-KeyGen.git
 
-      - name: Setup Python & Install Deps (Linux/macOS)
+      - name: Setup & Run Script (Linux/macOS)
         if: runner.os != 'Windows'
         shell: bash
         run: |
@@ -93,16 +93,11 @@ jobs:
             sudo apt update
             sudo apt install -y python3-pip python3-venv
           fi
+
           python3 -m venv venv
           source venv/bin/activate
           pip install -r requirements.txt
 
-      - name: Run Script (Linux/macOS)
-        if: runner.os != 'Windows'
-        shell: bash
-        run: |
-          cd ESET-KeyGen
-          source venv/bin/activate
           ACCOUNT="${{ steps.vars.outputs.account }}"
           KEY="${{ steps.vars.outputs.key }}"
           MAIL="${{ steps.vars.outputs.mail }}"
@@ -121,7 +116,7 @@ jobs:
           echo -e "\nKey:" >> $GITHUB_STEP_SUMMARY
           cat ./*KEYS.txt >> $GITHUB_STEP_SUMMARY 2>/dev/null || echo "None" >> $GITHUB_STEP_SUMMARY
 
-      - name: Run Script (Windows)
+      - name: Setup & Run Script (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
