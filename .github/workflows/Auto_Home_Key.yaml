@@ -1,0 +1,192 @@
+name: Auto Home Key Generator
+
+on:
+  schedule:
+    - cron: "0 */2 * * *"  # Every 2 hours
+  workflow_dispatch:
+    inputs:
+      account:
+        description: 'Number of Accounts to be generated (default = 0)'
+        required: false
+        default: '0'
+        type: string
+      key:
+        description: 'Number of Keys to be generated (default = 1)'
+        required: false
+        default: '1'
+        type: string
+      mail:
+        description: 'Choose the mail provider to generate license'
+        required: true
+        type: choice
+        options:
+          - 1secmail
+          - guerrillamail
+          - developermail
+          - mailticking
+          - fakemail
+          - inboxes
+          - incognitomail
+          - emailfake
+        default: emailfake
+      key_type:
+        description: 'Modes of operation'
+        required: true
+        type: choice
+        options:
+          - --key
+          - --small-business-key
+        default: --key
+      os:
+        description: 'Operating System of runner'
+        required: true
+        type: choice
+        options:
+          - macOS
+          - Linux
+          - Windows
+        default: Linux
+      branch:
+        description: "Repository branch"
+        required: false
+        type: choice
+        options:
+          - main
+          - test
+        default: main
+
+jobs:
+  set-os:
+    runs-on: ubuntu-latest
+    outputs:
+      selected-os: ${{ steps.set.outputs.selected-os }}
+    steps:
+      - name: Determine selected OS
+        id: set
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            case "${{ github.event.inputs.os }}" in
+              macOS)
+                echo "selected-os=macos-latest" >> $GITHUB_OUTPUT
+                ;;
+              Linux)
+                echo "selected-os=ubuntu-latest" >> $GITHUB_OUTPUT
+                ;;
+              Windows)
+                echo "selected-os=windows-latest" >> $GITHUB_OUTPUT
+                ;;
+            esac
+          else
+            echo "selected-os=all" >> $GITHUB_OUTPUT
+          fi
+
+  generate:
+    needs: set-os
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    
+          
+    steps:
+      - name: Check OS Filter
+        shell: bash
+        run: |
+          echo "This job is running on: ${{ matrix.os }}"
+          echo "User selected: ${{ needs.set-os.outputs.selected-os }}"
+      - name: Skip if not selected OS
+        if: needs.set-os.outputs.selected-os != 'all' && needs.set-os.outputs.selected-os != matrix.os
+        run: |
+          echo "Skipping ${{ matrix.os }} since it doesn't match selected: ${{ needs.set-os.outputs.selected-os }}"
+          exit 0
+        shell: bash
+
+      - name: Checkout
+        if: needs.set-os.outputs.selected-os == 'all' || needs.set-os.outputs.selected-os == matrix.os
+        uses: actions/checkout@v4
+
+      - name: Set Variables
+        id: vars
+        shell: bash
+        if: needs.set-os.outputs.selected-os == 'all' || needs.set-os.outputs.selected-os == matrix.os
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "account=${{ github.event.inputs.account }}" >> $GITHUB_OUTPUT
+            echo "key=${{ github.event.inputs.key }}" >> $GITHUB_OUTPUT
+            echo "mail=${{ github.event.inputs.mail }}" >> $GITHUB_OUTPUT
+            echo "key_type=${{ github.event.inputs.key_type }}" >> $GITHUB_OUTPUT
+            echo "branch=${{ github.event.inputs.branch }}" >> $GITHUB_OUTPUT
+            echo "os=${{ github.event.inputs.os }}" >> $GITHUB_OUTPUT
+            
+          else
+            echo "account=0" >> $GITHUB_OUTPUT
+            echo "key=1" >> $GITHUB_OUTPUT
+            echo "mail=emailfake" >> $GITHUB_OUTPUT
+            echo "key_type=--key" >> $GITHUB_OUTPUT
+            echo "branch=main" >> $GITHUB_OUTPUT
+            echo "os=Linux" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Clone Repository
+        if: needs.set-os.outputs.selected-os == 'all' || needs.set-os.outputs.selected-os == matrix.os
+        run: git clone -b ${{ steps.vars.outputs.branch }} https://github.com/Shariful797/ESET-KeyGen.git
+
+
+      - name: Run Script (Linux/macOS)
+        if: (matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest') && (needs.set-os.outputs.selected-os == 'all' || needs.set-os.outputs.selected-os == matrix.os)
+        shell: bash
+        run: |
+          cd ESET-KeyGen
+          if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            brew install python || true
+          else
+            sudo apt update
+            sudo apt install -y python3-pip python3-venv
+          fi
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+          
+          ACCOUNT="${{ steps.vars.outputs.account }}"
+          KEY="${{ steps.vars.outputs.key }}"
+          MAIL="${{ steps.vars.outputs.mail }}"
+          KEY_TYPE="${{ steps.vars.outputs.key_type }}"
+
+          if [[ "$ACCOUNT" != "0" ]]; then
+            python3 main.py --auto-detect-browser --account --email-api "$MAIL" --token "${{ secrets.TOKEN }}" --skip-update-check --no-logo --disable-progress-bar --disable-logging --repeat "$ACCOUNT"
+          fi
+          if [[ "$KEY" != "0" ]]; then
+            python3 main.py --auto-detect-browser "$KEY_TYPE" --email-api "$MAIL" --token "${{ secrets.TOKEN }}" --skip-update-check --no-logo --disable-progress-bar --disable-logging --repeat "$KEY"
+          fi
+
+          echo "Account:" >> $GITHUB_STEP_SUMMARY
+          cat ./*ACCOUNTS.txt >> $GITHUB_STEP_SUMMARY 2>/dev/null || true
+          echo -e "\nKey:" >> $GITHUB_STEP_SUMMARY
+          cat ./*KEYS.txt >> $GITHUB_STEP_SUMMARY 2>/dev/null || true
+
+      - name: Run Script (Windows)
+        if: matrix.os == 'windows-latest' && (needs.set-os.outputs.selected-os == 'all' || needs.set-os.outputs.selected-os == matrix.os)
+        shell: pwsh
+        run: |
+          cd ESET-KeyGen
+          python -m venv venv
+          .\venv\Scripts\activate
+          .\venv\Scripts\pip install -r requirements.txt
+          
+          $ACCOUNT = "${{ steps.vars.outputs.account }}"
+          $KEY = "${{ steps.vars.outputs.key }}"
+          $MAIL = "${{ steps.vars.outputs.mail }}"
+          $KEY_TYPE = "${{ steps.vars.outputs.key_type }}"
+
+          if ($ACCOUNT -ne 0) {
+            python main.py --auto-detect-browser --account --email-api $MAIL --token ${{ secrets.TOKEN }} --skip-update-check --no-logo --disable-progress-bar --disable-logging --repeat $ACCOUNT
+          }
+          if ($KEY -ne 0) {
+            python main.py --auto-detect-browser $KEY_TYPE --email-api $MAIL --token ${{ secrets.TOKEN }} --skip-update-check --no-logo --disable-progress-bar --disable-logging --repeat $KEY
+          }
+
+          echo "Account:" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          Get-Content -Path ./*ACCOUNTS.txt | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -ErrorAction SilentlyContinue
+          echo "`nKey:" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          Get-Content -Path ./*KEYS.txt | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -ErrorAction SilentlyContinue
