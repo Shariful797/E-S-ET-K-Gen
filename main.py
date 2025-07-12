@@ -570,6 +570,9 @@ def main(disable_exit=False):
                     EK_obj = EK(email_obj, DRIVER, 'ESET HOME' if args['key'] else 'SMALL BUSINESS')
                     EK_obj.sendRequestForKey()
                     l_name, l_key, l_out_date = EK_obj.getLD()
+                    important_note = ">❤️Sԋσɯ ყσυɾ Sυρρσɾƚ ɯιƚԋ Rҽαƈƚισɳʂ❤️"
+                    stay_tuned = r"𝕊𝕥𝕒𝕪 𝕥𝕦𝕟𝕖𝕕 𝕗𝕠𝕣 𝕞𝕠𝕣𝕖\!"
+                    mention = "@TechGift"
                     output_line = '\n'.join([
                         '',
                         '-------------------------------------------------',
@@ -583,8 +586,30 @@ def main(disable_exit=False):
                         ''
                     ])
                     formatted_date = l_out_date.replace(".", "/")
-                    output_line = f'\n🔸 Product: ||{l_name}||\n🕐 Expire: ||{formatted_date}||\n🔐 License: `{l_key}`\n'
-                    bot.send_message(-1001219056300, output_line + "@LicenseForAll")
+                    if args['key']:
+                        output_lines = '\n'.join([
+                            '',
+                            f'🟢 ᴘʀᴏᴅᴜᴄᴛ: ||🅴🆂🅴🆃 𝗛Ö𝗠𝗘 𝗦ҽ𝗰𝘂𝗿𝗶𝘁𝘆 𝗣𝗿ҽ𝗺𝗶𝘂𝗺||',
+                            f'🕐 ᴇxᴘɪʀᴇᴅ ᴅᴀᴛᴇ: ||{formatted_date}||',
+                            f'🔑 Kҽყ: `{l_key}`',
+                            ''
+                        ])
+                        full_message = f"{output_lines}\n\n{important_note}\n\n\n{stay_tuned}\n{mention}\n"
+                    
+                    elif args['small_business_key']:
+                        output_linessml = '\n'.join([
+                            '',
+                            f'🟢 ᴘʀᴏᴅᴜᴄᴛ: ||🅴🆂🅴🆃 𝗦𝗠𝗔𝗟𝗟 Business 𝗦ҽ𝗰𝘂𝗿𝗶𝘁𝘆||',
+                            f'🕐 ᴇxᴘɪʀᴇᴅ ᴅᴀᴛᴇ: ||{formatted_date}||',
+                            f'🔑 Kҽყ: `{l_key}`',
+                            ''
+                        ])
+                        full_message = f"{output_linessml}\n\n{important_note}\n\n\n{stay_tuned}\n{mention}\n"
+                    
+                    try:
+                        bot.send_message(chat_id=-1002669375057, text=full_message, parse_mode='MARKDOWNv2')
+                    except Exception as e:
+                        print(f"Error sending message: {e}")
                     if args['vpn_codes']:
                         EV_obj = EV(email_obj, DRIVER, ER_obj.window_handle)
                         EV_obj.sendRequestForVPNCodes()
@@ -605,10 +630,6 @@ def main(disable_exit=False):
                                 '-------------------------------------------------',
                                 ''
                             ])
-                            formatted_date = l_out_date.replace(".", "/")
-                            license_keys_formatted = "\n".join([f"KEY: `{key.strip()}`" for key in vpn_codes_line.split(',')])
-                            output_line = f'\n🔸 Product: ||ESET VPN||\n🕐 Expire: ||{formatted_date}||\n🔐 Keys:\n {license_keys_formatted}\n'
-                            bot.send_message(-1001219056300, output_line + "@LicenseForAll")
             # ESET ProtectHub
             elif args['protecthub_account'] or args['advanced_key']:
                 EPHR_obj = EPHR(email_obj, e_passwd, DRIVER)
