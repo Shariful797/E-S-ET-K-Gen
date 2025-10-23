@@ -2,6 +2,7 @@ import contextlib
 import logging
 import pathlib
 import json
+import copy
 import sys
 import io
 import telebot
@@ -841,4 +842,5 @@ if __name__ == '__main__':
                     main(disable_exit=True)
             except KeyboardInterrupt:
                 exit_program(0, DRIVER)
+
 
