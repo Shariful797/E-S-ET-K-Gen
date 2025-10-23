@@ -524,6 +524,8 @@ def main(disable_exit=False):
         
         # initialization and configuration of everything necessary for work            
         webdriver_path = None
+        token_value = args['token']
+        bot = telebot.TeleBot(token_value, parse_mode='MARKDOWNv2')
         browser_name = GOOGLE_CHROME
         custom_browser_location = None if args['custom_browser_location'] == '' else args['custom_browser_location']
         webdriver_installer = WebDriverInstaller(browser_name, custom_browser_location)
@@ -842,5 +844,6 @@ if __name__ == '__main__':
                     main(disable_exit=True)
             except KeyboardInterrupt:
                 exit_program(0, DRIVER)
+
 
 
