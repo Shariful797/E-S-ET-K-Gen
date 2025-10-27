@@ -36,7 +36,7 @@ jobs:
           mv ./dist/main "./ESET-KeyGen_v${{ github.event.inputs.version }}_macos"
 
       - name: Upload macOS artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: macos-artifact
           path: ./ESET-KeyGen_v${{ github.event.inputs.version }}_macos
@@ -65,7 +65,7 @@ jobs:
           Move-Item -Path .\dist\main.exe -Destination ".\ESET-KeyGen_v${{ github.event.inputs.version }}_win64.exe"
 
       - name: Upload Windows artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: windows-artifacts
           path: |
