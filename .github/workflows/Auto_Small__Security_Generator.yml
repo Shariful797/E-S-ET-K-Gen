@@ -89,7 +89,7 @@ jobs:
         run: |
           cd E-S-ET-K-Gen
           if [[ "$RUNNER_OS" == "macOS" ]]; then
-            brew install python@3.11 || true
+            brew install python@3.14 || true
           else
             sudo apt update
             sudo apt install -y python3-pip python3-venv
@@ -97,6 +97,7 @@ jobs:
 
           python3 -m venv venv
           source venv/bin/activate
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
 
           ACCOUNT="${{ steps.vars.outputs.account }}"
@@ -122,6 +123,7 @@ jobs:
         run: |
           cd E-S-ET-K-Gen
           python -m venv venv
+          .\venv\Scripts\python -m pip install --upgrade pip
           .\venv\Scripts\pip install -r requirements.txt
           .\venv\Scripts\Activate.ps1
 
