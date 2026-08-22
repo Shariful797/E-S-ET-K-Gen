@@ -300,13 +300,17 @@ class InboxesAPI:
                     button.click()
                     break
             time.sleep(2)
-            for element in self.driver.execute_script(f'return {GET_EBTN}("span")'):
-                new_email = ''.join(element.text.split())
-                if new_email is not None:
-                    new_email = re.match(r'[-a-z0-9+.]+@[a-z]+(\.[a-z]+)+', new_email)
-                    if new_email is not None:
-                        self.email = new_email.group()
-                        break
+            try:
+                for _ in range(3):
+                    for element in self.driver.execute_script(f'return {GET_EBTN}("span")'):
+                        new_email = ''.join(element.text.split())
+                        if new_email is not None:
+                            new_email = re.match(r'[-a-z0-9+.]+@[a-z]+(\.[a-z]+)+', new_email)
+                            if new_email is not None:
+                                self.email = new_email.group()
+                                break
+            except:
+                time.sleep(1)
     
     def get_messages(self):
         r = requests.get(f'https://inboxes.com/api/v2/inbox/{self.email}')
