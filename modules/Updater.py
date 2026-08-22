@@ -94,9 +94,9 @@ class Updater:
         self.releases = None
     
     def get_releases(self, version='latest'):
-        url = 'https://api.github.com/repos/shadowcopyrz/ESET-KGEN-COPY/releases'
+        url = 'https://api.github.com/repos/shadowcopyrz/etkg/releases'
         if version == 'latest':
-            url = 'https://api.github.com/repos/shadowcopyrz/ESET-KGEN-COPY/releases/latest'
+            url = 'https://api.github.com/repos/shadowcopyrz/etkg/releases/latest'
         try:
             response = requests.get(url, timeout=5)
             update_json = response.json()
