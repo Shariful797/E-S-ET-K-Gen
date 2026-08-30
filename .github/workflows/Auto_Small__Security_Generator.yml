@@ -78,7 +78,7 @@ jobs:
           fi
 
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Clone Repository
         run: git clone -b "${{ steps.vars.outputs.branch }}" https://github.com/Shariful797/E-S-ET-K-Gen.git
