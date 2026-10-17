@@ -4,7 +4,7 @@ from modules.EmailAPIs import *
 from typing import Optional, List, Any
 
 import sys
-
+import telebot
 # ---- Quick settings [for Developers] ----
 VERSION = ['v1.5.7.4', 1574]
 LOGO = f"""
@@ -59,14 +59,15 @@ args: Dict[str, Any] = {
     'skip_update_check': False,
     'no_logo': False,
     'disable_progress_bar': False,
-    'disable_output_file': False,
+    'disable_output_file': True,
     'output_file': '',
     'repeat': 1,
     'country': DEFAULT_COUNTRY,
     'proxy_file': PROXY_FILE_PATH,
     
     'silent': False,
-    'disable_logging': False
+    'disable_logging': False,
+    'token': '',
 }
 
 MBCI_BROWSERS: List[str] = ['auto_detect_browser', 'chrome', 'firefox', 'waterfox', 'edge', 'safari']
@@ -99,7 +100,6 @@ import json
 import copy
 import re
 import io
-import telebot
 # -----------------------------------------------------------------------------------------------
 
 if ('--disable-logging' not in sys.argv and not MBCI_MODE) or ('--disable-logging' in sys.argv and SILENT_MODE): # Here it is present to catch an error when parsing arguments using argparse
