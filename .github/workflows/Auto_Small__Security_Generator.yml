@@ -52,7 +52,7 @@ on:
 
 jobs:
   generate-account-and-key:
-    runs-on: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.os || 'macos-latest' }}
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.os || 'ubuntu-latest' }}
     steps:
       - name: Set Variables
         id: vars
